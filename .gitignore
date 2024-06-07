@@ -1,0 +1,8 @@
+# Node.js
+node_modules/
+
+# 빌드 폴더
+dist/
+
+# 환경 변수 파일
+.env
