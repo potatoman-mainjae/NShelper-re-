@@ -107,9 +107,11 @@
 
             // 결과를 0 또는 1로 출력
             let result;
-            if (prediction[maxIndex].className === "개") {
+            if (prediction[maxIndex].className === "많음") {
+                result = 2;
+            } else if(prediction[maxIndex].className === "적음") {
                 result = 1;
-            } else {
+            }else{
                 result = 0;
             }
 
