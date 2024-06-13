@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teachable Machine Dog/Cat Classifier</title>
+    <title>Teachable Machine Custom Classifier</title>
 </head>
 <body>
-    <div>Teachable Machine Dog/Cat Classifier</div>
+    <div>Teachable Machine Custom Classifier</div>
+    <div>
+        <label for="model-json">Upload model.json:</label>
+        <input type="file" id="model-json" accept=".json">
+    </div>
+    <div>
+        <label for="model-weights">Upload weights.bin:</label>
+        <input type="file" id="model-weights" accept=".bin">
+    </div>
+    <div>
+        <label for="model-metadata">Upload metadata.json:</label>
+        <input type="file" id="model-metadata" accept=".json">
+    </div>
     <button type="button" id="start-button">Start</button>
     <div id="webcam-container"></div>
     <div id="label-container"></div>
@@ -34,16 +46,28 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app); // Initialize Firestore
 
-        // Model URL
-        const modelURL = "/mnt/data/model.json";
-        const metadataURL = "/mnt/data/metadata.json";
-
         let model, webcam, labelContainer, maxPredictions;
 
         async function init() {
+            const modelFile = document.getElementById('model-json').files[0];
+            const weightsFile = document.getElementById('model-weights').files[0];
+            const metadataFile = document.getElementById('model-metadata').files[0];
+
+            if (!modelFile || !weightsFile || !metadataFile) {
+                alert("Please upload all model files (model.json, weights.bin, metadata.json).");
+                return;
+            }
+
+            const modelURL = URL.createObjectURL(modelFile);
+            const metadataURL = URL.createObjectURL(metadataFile);
+
             // Load the model
             model = await tmImage.load(modelURL, metadataURL);
             maxPredictions = model.getTotalClasses();
+
+            // Cleanup object URLs
+            URL.revokeObjectURL(modelURL);
+            URL.revokeObjectURL(metadataURL);
 
             // Setup webcam
             const flip = true; // whether to flip the webcam
@@ -104,9 +128,11 @@
                 }
             }
 
-            // Output result as 0 or 1
+            // Output result based on class name
             let result;
-            if (prediction[maxIndex].className === "Dog") {
+            if (prediction[maxIndex].className === "많음") {
+                result = 2;
+            } else if (prediction[maxIndex].className === "보통") {
                 result = 1;
             } else {
                 result = 0;
