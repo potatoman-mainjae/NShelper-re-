@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teachable Machine Image Model</title>
+    <title>Teachable Machine Dog/Cat Classifier</title>
 </head>
 <body>
-    <div>Teachable Machine Image Model</div>
+    <div>Teachable Machine Dog/Cat Classifier</div>
     <button type="button" id="start-button">Start</button>
     <div id="webcam-container"></div>
     <div id="label-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <script type="module">
-        // Firebase 관련 모듈 불러오기
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // Firebase 구성 정보
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDh__ZM9sX05gWDYpYv2yNyKF0AsIYdCvU",
             authDomain: "complexdb-1aea4.firebaseapp.com",
@@ -30,26 +29,26 @@
             measurementId: "G-Q4BEN3TPRH"
         };
 
-        // Firebase 초기화
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        const db = getFirestore(app); // Firestore 초기화
+        const db = getFirestore(app); // Initialize Firestore
 
-        const URL = "https://teachablemachine.withgoogle.com/models/NS6FlekkR/";
+        // Model URL
+        const modelURL = "/mnt/data/model.json";
+        const metadataURL = "/mnt/data/metadata.json";
+
         let model, webcam, labelContainer, maxPredictions;
 
         async function init() {
-            const modelURL = URL + "model.json";
-            const metadataURL = URL + "metadata.json";
-
-            // 모델 로드
+            // Load the model
             model = await tmImage.load(modelURL, metadataURL);
             maxPredictions = model.getTotalClasses();
 
-            // 웹캠 설정
-            const flip = true;
+            // Setup webcam
+            const flip = true; // whether to flip the webcam
             webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
-            await webcam.setup(); // 웹캠 접근 권한 요청
+            await webcam.setup(); // request access to the webcam
             await webcam.play();
             window.requestAnimationFrame(loop);
 
@@ -59,10 +58,10 @@
                 labelContainer.appendChild(document.createElement("div"));
             }
 
-            // 주기적으로 데이터 수집하기
+            // Collect data periodically
             setInterval(() => {
                 predictAndSave();
-            }, 1000); // 1초마다 실행
+            }, 1000); // every 1 second
         }
 
         async function loop() {
@@ -72,7 +71,7 @@
         }
 
         async function predict() {
-            // 예측 수행
+            // Make a prediction
             const prediction = await model.predict(webcam.canvas);
             let maxProb = 0;
             let maxIndex = 0;
@@ -81,7 +80,7 @@
                 const probability = prediction[i].probability.toFixed(2);
                 labelContainer.childNodes[i].innerHTML = prediction[i].className + ": " + probability;
 
-                // 가장 높은 확률을 가진 클래스 찾기
+                // Find the class with the highest probability
                 if (probability > maxProb) {
                     maxProb = probability;
                     maxIndex = i;
@@ -90,7 +89,7 @@
         }
 
         async function predictAndSave() {
-            // 예측 수행
+            // Make a prediction
             const prediction = await model.predict(webcam.canvas);
             let maxProb = 0;
             let maxIndex = 0;
@@ -98,26 +97,24 @@
             for (let i = 0; i < maxPredictions; i++) {
                 const probability = prediction[i].probability.toFixed(2);
 
-                // 가장 높은 확률을 가진 클래스 찾기
+                // Find the class with the highest probability
                 if (probability > maxProb) {
                     maxProb = probability;
                     maxIndex = i;
                 }
             }
 
-            // 결과를 0 또는 1로 출력
+            // Output result as 0 or 1
             let result;
-            if (prediction[maxIndex].className === "많음") {
-                result = 2;
-            } else if(prediction[maxIndex].className === "적음") {
+            if (prediction[maxIndex].className === "Dog") {
                 result = 1;
-            }else{
+            } else {
                 result = 0;
             }
 
-            console.log(result); // 콘솔에 결과 출력
+            console.log(result); // Output result to console
 
-            // 결과를 Firestore에 저장
+            // Save result to Firestore
             try {
                 const docRef = await addDoc(collection(db, "predictions"), {
                     result: result,
@@ -129,7 +126,7 @@
             }
         }
 
-        // 버튼 클릭 이벤트 리스너 설정
+        // Set button click event listener
         document.getElementById("start-button").addEventListener("click", init);
     </script>
 </body>
