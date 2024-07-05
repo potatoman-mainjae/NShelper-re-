@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
     <div id="label-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
     <script type="module">
         // Firebase 관련 모듈 불러오기
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -35,7 +37,8 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app); // Firestore 초기화
 
-        const URL = "https://teachablemachine.withgoogle.com/models/NS6FlekkR/";
+        const URL = "./my_model/";
+
         let model, webcam, labelContainer, maxPredictions;
 
         async function init() {
@@ -105,9 +108,11 @@
                 }
             }
 
-            // 결과를 0 또는 1로 출력
+            // 결과를 0 또는 1또는 2로 출력
             let result;
-            if (prediction[maxIndex].className === "개") {
+            if (prediction[maxIndex].className === "class1") {
+                result = 2;
+            } else if(prediction[maxIndex].className === "class2"){
                 result = 1;
             } else {
                 result = 0;
