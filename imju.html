@@ -111,9 +111,9 @@
 
             // 결과를 0 또는 1 또는 2로 출력
             let result;
-            if (prediction[maxIndex].className === "많음(11이상)") {
+            if (prediction[maxIndex].className === "많음(10~14)") {
                 result = 2;
-            } else if (prediction[maxIndex].className === "보통(6이상11이하)") {
+            } else if (prediction[maxIndex].className === "보통(5~9)") {
                 result = 1;
             } else {
                 result = 0;
