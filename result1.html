@@ -135,7 +135,7 @@
         const yellowLight = document.getElementById('yellow-light');
         const redLight = document.getElementById('red-light');
 
-        const predictionsQuery = query(collection(db, "conditions"), orderBy("timestamp", "desc"), limit(1));
+        const predictionsQuery = query(collection(db, "predictions"), orderBy("timestamp", "desc"), limit(1));
 
         onSnapshot(predictionsQuery, (snapshot) => {
             snapshot.forEach((doc) => {
@@ -156,7 +156,7 @@
                     redLight.classList.add('red');
                 }
 
-                console.log(`Current condition: ${result}`);
+                console.log(`prediction condition: ${result}`);
             });
         });
     </script>
