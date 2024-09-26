@@ -135,33 +135,31 @@
         const yellowLight = document.getElementById('yellow-light');
         const redLight = document.getElementById('red-light');
 
-        const docRef = doc(db, "condition", "current_status"); // Adjust if necessary
+        const currentStatusQuery = query(collection(db, "condition", "current_status"), limit(1));
 
-// Fetch the document snapshot
-const docSnap = await getDoc(docRef);
+onSnapshot(currentStatusQuery, (snapshot) => {
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+        const totalCount = data.total_count;
 
-if (docSnap.exists()) {
-    // Access total_count directly from the document's data
-    const data = docSnap.data();
-    const totalCount = data.total_count;
+        // Reset lights
+        greenLight.classList.remove('green');
+        yellowLight.classList.remove('yellow');
+        redLight.classList.remove('red');
 
-    // Reset Lights
-    greenLight.classList.remove('green');
-    yellowLight.classList.remove('yellow');
-    redLight.classList.remove('red');
+        // Update light based on total_count
+        if (totalCount === 0) {
+            greenLight.classList.add('green');
+        } else if (totalCount === 1) {
+            yellowLight.classList.add('yellow');
+        } else if (totalCount === 2) {
+            redLight.classList.add('red');
+        }
 
-    // Update Light based on total_count
-    if (totalCount === 0) {
-        greenLight.classList.add('green');
-    } else if (totalCount === 1) {
-        yellowLight.classList.add('yellow');
-    } else if (totalCount === 2) {
-        redLight.classList.add('red');
-    }
+        console.log(`Total Count: ${totalCount}`);
+    });
+});
 
-    console.log(`Current total_count: ${totalCount}`);
-} 
-       
     </script>
 
     <!-- footer section -->
