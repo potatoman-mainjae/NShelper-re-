@@ -135,30 +135,33 @@
         const yellowLight = document.getElementById('yellow-light');
         const redLight = document.getElementById('red-light');
 
-        const predictionsQuery = query(collection(db, "condition"), orderBy("total_count", "desc"));
+        const docRef = doc(db, "condition", "current_status"); // Adjust if necessary
 
-        onSnapshot(predictionsQuery, (snapshot) => {
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const result = data.result;
+// Fetch the document snapshot
+const docSnap = await getDoc(docRef);
 
-                // Reset lights
-                greenLight.classList.remove('green');
-                yellowLight.classList.remove('yellow');
-                redLight.classList.remove('red');
+if (docSnap.exists()) {
+    // Access total_count directly from the document's data
+    const data = docSnap.data();
+    const totalCount = data.total_count;
 
-                // Update light based on result
-                if (result === 0) {
-                    greenLight.classList.add('green');
-                } else if (result === 1) {
-                    yellowLight.classList.add('yellow');
-                } else if (result === 2) {
-                    redLight.classList.add('red');
-                }
+    // Reset Lights
+    greenLight.classList.remove('green');
+    yellowLight.classList.remove('yellow');
+    redLight.classList.remove('red');
 
-                console.log(`Current condition: ${result}`);
-            });
-        });
+    // Update Light based on total_count
+    if (totalCount === 0) {
+        greenLight.classList.add('green');
+    } else if (totalCount === 1) {
+        yellowLight.classList.add('yellow');
+    } else if (totalCount === 2) {
+        redLight.classList.add('red');
+    }
+
+    console.log(`Current total_count: ${totalCount}`);
+} 
+       
     </script>
 
     <!-- footer section -->
