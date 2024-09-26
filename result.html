@@ -2,29 +2,20 @@
 <html>
 
 <head>
-    <!-- Basic -->
+    <!-- Basic Meta Tags -->
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <!-- Mobile Metas -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <!-- Site Metas -->
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-
     <title>스쿨톡톡</title>
 
-    <!-- slider stylesheet -->
+    <!-- External Stylesheets -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
-
-    <!-- bootstrap core css -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-
-    <!-- fonts style -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Poppins:400,700&display=swap" rel="stylesheet">
-    <!-- Custom styles for this template -->
     <link href="css/style.css" rel="stylesheet" />
-    <!-- responsive style -->
     <link href="css/responsive.css" rel="stylesheet" />
 
     <style>
@@ -37,7 +28,7 @@
             display: flex;
             align-items: center;
             justify-content: space-around;
-            margin: 0 auto; /* Center the traffic light container */
+            margin: 0 auto;
         }
 
         .light {
@@ -63,42 +54,36 @@
 
 <body class="sub_page">
     <div class="hero_area">
-        <!-- header section strats -->
         <header class="header_section">
             <div class="container-fluid">
-              <nav class="navbar navbar-expand-lg custom_nav-container pt-3">
-                <a class="navbar-brand" href="index.html">
-                  <span>
-                    스쿨톡톡
-                  </span>
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-      
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
-      
-                    <ul class="navbar-nav">
-                      <li class="nav-item active">
-                        <a class="nav-link" href="index.html"> 메인 페이지 <span class="sr-only">(current)</span></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="do.html"> 작품 제작 <span class="sr-only">(current)</span></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="imju.html"> 판단A.I </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </nav>
+                <nav class="navbar navbar-expand-lg custom_nav-container pt-3">
+                    <a class="navbar-brand" href="index.html">
+                        <span>스쿨톡톡</span>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
+                            <ul class="navbar-nav">
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="index.html">메인 페이지</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="do.html">작품 제작</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="imju.html">판단A.I</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
             </div>
-          </header>
-        <!-- end header section -->
+        </header>
     </div>
 
-    <!-- New content section -->
     <section class="new_content_section layout_padding">
         <div class="container">
             <div id="status-container" class="traffic-light">
@@ -115,7 +100,7 @@
     <script type="module">
         // Firebase configuration
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDh__ZM9sX05gWDYpYv2yNyKF0AsIYdCvU",
@@ -128,49 +113,53 @@
             measurementId: "G-Q4BEN3TPRH"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Traffic Light DOM elements
         const greenLight = document.getElementById('green-light');
         const yellowLight = document.getElementById('yellow-light');
         const redLight = document.getElementById('red-light');
 
-        const currentStatusQuery = query(collection(db, "condition", "current_status"), limit(1));
+        // Reference to the specific document in Firestore
+        const currentStatusDoc = doc(db, "condition", "current_status");
 
-onSnapshot(currentStatusQuery, (snapshot) => {
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        const totalCount = data.total_count;
+        // Listen for real-time updates
+        onSnapshot(currentStatusDoc, (doc) => {
+            if (doc.exists()) {
+                const data = doc.data();
+                const totalCount = data.total_count;
 
-        // Reset lights
-        greenLight.classList.remove('green');
-        yellowLight.classList.remove('yellow');
-        redLight.classList.remove('red');
+                // Reset lights
+                greenLight.classList.remove('green');
+                yellowLight.classList.remove('yellow');
+                redLight.classList.remove('red');
 
-        // Update light based on total_count
-        if (totalCount === 0) {
-            greenLight.classList.add('green');
-        } else if (totalCount === 1) {
-            yellowLight.classList.add('yellow');
-        } else if (totalCount === 2) {
-            redLight.classList.add('red');
-        }
+                // Update light based on total_count
+                if (totalCount === 0) {
+                    greenLight.classList.add('green');
+                } else if (totalCount === 1) {
+                    yellowLight.classList.add('yellow');
+                } else if (totalCount === 2) {
+                    redLight.classList.add('red');
+                }
 
-        console.log(`Total Count: ${totalCount}`);
-    });
-});
-
+                console.log(`Total Count: ${totalCount}`);
+            } else {
+                console.log("No such document!");
+            }
+        });
     </script>
 
-    <!-- footer section -->
     <section class="container-fluid footer_section">
-        <p>스쿨톡톡 > school help center</a></p>
+        <p>스쿨톡톡 > school help center</p>
     </section>
 
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-    <!-- owl carousel script -->
+
     <script type="text/javascript">
         $(".owl-carousel").owlCarousel({
             loop: false,
@@ -180,17 +169,11 @@ onSnapshot(currentStatusQuery, (snapshot) => {
             autoplay: true,
             autoplayHoverPause: true,
             responsive: {
-                0: {
-                    items: 1
-                },
-                1000: {
-                    items: 3
-                }
+                0: { items: 1 },
+                1000: { items: 3 }
             }
         });
     </script>
-    <!-- end owl carousel script -->
-
 </body>
 
 </html>
