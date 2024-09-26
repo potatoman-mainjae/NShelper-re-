@@ -135,7 +135,7 @@
         const yellowLight = document.getElementById('yellow-light');
         const redLight = document.getElementById('red-light');
 
-        const predictionsQuery = query(collection(db, "condition"));
+        const predictionsQuery = query(collection(db, "condition"), orderBy("total_count", "desc"));
 
         onSnapshot(predictionsQuery, (snapshot) => {
             snapshot.forEach((doc) => {
